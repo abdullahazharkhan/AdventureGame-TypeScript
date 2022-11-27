@@ -1,113 +1,147 @@
-import promptSync from "prompt-sync";
-const prompt = promptSync();
+import figlet from "figlet";
+import chalk from "chalk";
+import inquirer from "inquirer";
+import chalkAnimation from "chalk-animation";
 
-function main(): void {
-  // Game Variables
-  const enemies: string[] = ["Assasin", "Skeleton", "Warrior", "Addy"];
-  const maxEnemyHealth: number = 75;
-  const enemyAttackDamage: number = 25;
-  let health: number = 100;
-  const attackDamage: number = 50;
-  let numHealthPotions: number = 3;
-  const healthPotionHealAmount: number = 30;
-  const healthPotionDropChance: number = 50; // percentage
+const sleep = (ms = 3000) => new Promise((r) => setTimeout(r, ms));
+async function Welcome() {
+  chalkAnimation.glitch(
+    chalk.bold.red("\t\tWelcome to the " + chalk.redBright("DUNGEON!")),
+    0.3
+  );
 
-  let running: boolean = true;
+  await sleep();
+}
+await Welcome();
 
-  console.log("\n\tWelcome to The Dungeon!");
+// game variables
+const enemies: string[] = ["Skeleton", "Warrior", "Assasin"];
+const maxEnemyHealth: number = 75;
+const enemyAttackDamage: number = 25;
+let health: number = 100;
+const attackDamage: number = 50;
+let numBandages: number = 3;
+const numBandagesHealAmount: number = 30;
+const bandagesDropChance: number = 50;
 
-  Game: while (running) {
-    console.log("-----------------------------------------------");
+let running: boolean = true;
 
-    let enemyHealth = Math.floor(Math.random() * maxEnemyHealth) + 1;
-    let enemy: string = enemies[Math.floor(Math.random() * enemies.length)];
-    console.log(`\t# ${enemy} here! #\n`);
+GAME: while (running) {
+  console.log(
+    chalk.bold.red(
+      `-------------------------------------------------------------------`
+    )
+  );
 
-    while (enemyHealth > 0) {
-      console.log(`\t Your HP: ${health}`);
-      console.log(`\t ${enemy}'s HP: ${enemyHealth}`);
-      console.log(`\n\t What would you like to do?`);
-      console.log(`\t 1. Attack`);
-      console.log(`\t 2. Drink Health Potion`);
-      console.log(`\t 3. Run!`);
+  let enemyHealth: number = Math.floor(Math.random() * maxEnemyHealth);
+  let enemy: string = enemies[Math.floor(Math.random() * enemies.length)];
 
-      let input: string = prompt("");
-      if (input == "1") {
-        let damageDealt: number = Math.floor(Math.random() * attackDamage) + 1;
-        let damageTaken: number =
-          Math.floor(Math.random() * enemyAttackDamage) + 1;
+  chalkAnimation.pulse(`\t\t# ${enemy} is here #\n`);
+  await sleep();
 
-        enemyHealth -= damageDealt;
-        health -= damageTaken;
+  while (enemyHealth > 0) {
+    console.log(chalk.yellow(`\t Your HP: ${health}`));
+    console.log(chalk.yellow(`\t ${enemy}'s HP: ${enemyHealth}`));
+    console.log(chalk.yellow(`\t What would you like to do?`));
+    let ans = await inquirer.prompt([
+      {
+        type: "list",
+        name: "choose",
+        choices: [
+          chalk.yellow("Attack"),
+          chalk.yellow("Bandage Wound"),
+          chalk.yellow("Run"),
+        ],
+      },
+    ]);
 
-        console.log(`\t> You strike the ${enemy} for ${damageDealt} damage.`);
-        console.log(`\t> You recieve ${damageTaken} in retaliation!`);
+    if (ans.choose == chalk.yellow("Attack")) {
+      let damageDealt: number = Math.floor(Math.random() * attackDamage);
+      let damageTaken: number = Math.floor(Math.random() * enemyAttackDamage);
 
-        if (health < 1) {
-          console.log(
-            `You have taken too much damage, you are toow eak to go on!`
-          );
-          break;
-        }
-      } else if (input == "2") {
-        if (numHealthPotions > 0) {
-          health += healthPotionHealAmount;
-          numHealthPotions--;
-          console.log(
-            `\t> You drink a health potion. \n\t You now have ${health} HP. \n\t You have ${numHealthPotions} health potions left.`
-          );
-        } else {
-          console.log(
-            `You have no health potions left! Defeat enemies for a chance to get!`
-          );
-        }
-      } else if (input == "3") {
-        console.log(`You run away from the ${enemy}!`);
-        continue;
-      } else {
-        console.log(`\t Invalid Command`);
-      }
+      enemyHealth -= damageDealt;
+      health -= damageTaken;
+
+      console.log(
+        chalk.yellow(`\t> You strike the ${enemy} for ${damageDealt} damage.`)
+      );
+      console.log(
+        chalk.yellow(`\t> You recieve ${damageTaken} in retaliation!`)
+      );
+
       if (health < 1) {
-        console.log(`You limp out of the dungeon, weak from battle.`);
+        console.log(
+          chalk.red(
+            `You have taken too much damage, you are too weak to go on!`
+          )
+        );
         break;
       }
-      console.log(
-        `-----------------------------------------------------------------`
-      );
-      console.log(` # ${enemy} was defeated! #`);
-      console.log(` # You have ${health} HP left. #`);
-
-      if (Math.floor(Math.random() * 100) + 1 > healthPotionDropChance) {
-        numHealthPotions++;
-        console.log(` # their is a health potion! # `);
-        console.log(` # You have ${numHealthPotions} health potion(s). #`);
+    } else if (ans.choose == chalk.yellow("Bandage Wound")) {
+      if (numBandages > 0) {
+        health += numBandagesHealAmount;
+        numBandages--;
+        console.log(
+          chalk.yellow(
+            `You got a bandage \n You now have ${health} HP! \n You now have ${numBandages} left`
+          )
+        );
+      } else {
+        console.log(
+          chalk.yellow(
+            `\t> You have no bandages left. Defeat enemies for a chance to get one.`
+          )
+        );
       }
-      console.log(
-        `-----------------------------------------------------------------`
-      );
-      console.log(`What would you like to do now?`);
-      console.log(`1. Continue fighting`);
-      console.log(`2. Exit dungeon`);
-
-      input = prompt("");
-
-      while (input != "1" && input != "2") {
-        console.log(`Invalid Command`);
-        input = prompt("");
-      }
-
-      if (input == "1") {
-        console.log(`You continue on your adventure!`);
-      } else if (input == "2") {
-        console.log(`You exit the dungeon, successful from your adventure!`);
-        break;
-      }
+    } else {
+      console.log(chalk.yellow(`You run away from the ${enemy}`));
+      continue GAME;
     }
+  }
+  if (health < 1) {
+    console.log(chalk.red(`You limp out of the dungeon, weak from battle.`));
+    break;
+  }
+  console.log(
+    chalk.red(
+      `-------------------------------------------------------------------`
+    )
+  );
+  console.log(chalk.green(` # ${enemy} was defeated! #`));
+  console.log(chalk.green(` # You have ${health} HP left`));
 
-    console.log(`###########################`);
-    console.log(`The End`);
-    console.log(`###########################`);
+  if (Math.floor(Math.random() * 100) > bandagesDropChance) {
+    numBandages++;
+    console.log(chalk.green(` # The ${enemy} dropped a bandage # `));
+    console.log(` # You now have ${numBandages} bandage(s).`);
+  }
+  console.log(
+    chalk.red(
+      `-------------------------------------------------------------------`
+    )
+  );
+  console.log(chalk.yellow(`What would you like to do now?`));
+  let answ = await inquirer.prompt([
+    {
+      name: "choose",
+      type: "list",
+      choices: [
+        chalk.yellow("Continue Fighting"),
+        chalk.yellow("Exit Dungeon"),
+      ],
+    },
+  ]);
+
+  if (answ.choose == chalk.yellow("Continue Fighting")) {
+    console.log(chalk.yellow(`You continue on your adventure!`));
+  } else {
+    console.log(
+      chalk.red(`You exit the dungeon, successfully from your adventures`)
+    );
+    break;
   }
 }
 
-main();
+chalkAnimation.karaoke(
+  "---------------------------The END----------------------------------------"
+);

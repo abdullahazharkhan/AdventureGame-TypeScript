@@ -1,18 +1,25 @@
 {
-  "name": "adventuregame",
-  "version": "1.0.0",
+  "name": "you-vs-enemy",
+  "version": "1.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "bin": "./dist/index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "prompt-sync": "^4.2.0"
+    "chalk": "^5.1.2",
+    "chalk-animation": "^2.0.3",
+    "figlet": "^1.5.2",
+    "inquirer": "^9.1.4"
   },
   "devDependencies": {
-    "@types/prompt-sync": "^4.2.0"
+    "@types/chalk-animation": "^1.6.1",
+    "@types/figlet": "^1.5.5",
+    "@types/inquirer": "^9.0.3"
   }
 }
